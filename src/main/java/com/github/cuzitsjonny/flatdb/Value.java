@@ -11,13 +11,18 @@ public class Value
     private Boolean booleanData;
     private FlatDBLong longData;
 
-    public Value(FlatDBDataType dataType, int data)
+    public Value(FlatDBDataType dataType)
+    {
+        this.dataType = dataType;
+    }
+
+    public Value(FlatDBDataType dataType, Integer data)
     {
         this.dataType = dataType;
         this.intData = data;
     }
 
-    public Value(FlatDBDataType dataType, float data)
+    public Value(FlatDBDataType dataType, Float data)
     {
         this.dataType = dataType;
         this.floatData = data;
@@ -29,7 +34,7 @@ public class Value
         this.stringData = data;
     }
 
-    public Value(FlatDBDataType dataType, boolean data)
+    public Value(FlatDBDataType dataType, Boolean data)
     {
         this.dataType = dataType;
         this.booleanData = data;
@@ -69,6 +74,11 @@ public class Value
     public long getLongData()
     {
         return longData.getValue();
+    }
+
+    public boolean isNull()
+    {
+        return intData == null && floatData == null && stringData == null && booleanData == null && longData == null;
     }
 
     public void load(BitStream bitStream)

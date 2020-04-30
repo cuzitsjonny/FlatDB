@@ -176,32 +176,41 @@ public class Table
                     for (int j = 0; j < amountOfValues; j++)
                     {
                         Column column = getColumn(j);
-                        int brokenDataType = bitStream.readIntLE();
+                        boolean isNull = bitStream.readIntLE() == 0;
 
-                        switch (column.getDataType())
+                        if (isNull)
                         {
-                            case INT:
-                            case UNSIGNED_INT:
-                                row.setValue(column, new Value(column.getDataType(), bitStream.readIntLE()));
-                                break;
-                            case FLOAT:
-                                row.setValue(column, new Value(column.getDataType(), bitStream.readFloatLE()));
-                                break;
-                            case VARCHAR:
-                            case TEXT:
-                                int stringDataAddress = bitStream.readIntLE();
+                            row.setValue(column, new Value(column.getDataType()));
 
-                                row.setValue(column, new Value(column.getDataType(), new FlatDBString(stringDataAddress)));
-                                break;
-                            case BIT:
-                                row.setValue(column, new Value(column.getDataType(), bitStream.readIntLE() != 0));
-                                break;
-                            case BIGINT:
-                            case UNSIGNED_BIGINT:
-                                int longDataAddress = bitStream.readIntLE();
+                            bitStream.setReadOffset(bitStream.getReadOffset() + 32);
+                        }
+                        else
+                        {
+                            switch (column.getDataType())
+                            {
+                                case INT:
+                                case UNSIGNED_INT:
+                                    row.setValue(column, new Value(column.getDataType(), bitStream.readIntLE()));
+                                    break;
+                                case FLOAT:
+                                    row.setValue(column, new Value(column.getDataType(), bitStream.readFloatLE()));
+                                    break;
+                                case VARCHAR:
+                                case TEXT:
+                                    int stringDataAddress = bitStream.readIntLE();
 
-                                row.setValue(column, new Value(column.getDataType(), new FlatDBLong(longDataAddress)));
-                                break;
+                                    row.setValue(column, new Value(column.getDataType(), new FlatDBString(stringDataAddress)));
+                                    break;
+                                case BIT:
+                                    row.setValue(column, new Value(column.getDataType(), bitStream.readIntLE() != 0));
+                                    break;
+                                case BIGINT:
+                                case UNSIGNED_BIGINT:
+                                    int longDataAddress = bitStream.readIntLE();
+
+                                    row.setValue(column, new Value(column.getDataType(), new FlatDBLong(longDataAddress)));
+                                    break;
+                            }
                         }
                     }
 
